@@ -15,10 +15,10 @@ class Logo extends StatelessWidget {
         child: Column(
           children: [
             Image(
-              image: AssetImage('assets/tag-logo.png'),
+              image: AssetImage('assets/fakessenger-logo.png'),
             ),
             SizedBox(
-              height: 20,
+              height: 10,
             ),
             Text(
               title,

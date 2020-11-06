@@ -11,7 +11,7 @@ class ButtonBlue extends StatelessWidget {
     return RaisedButton(
       elevation: 2,
       highlightElevation: 5,
-      color: Colors.blue.shade700,
+      color: Color.fromRGBO(68, 138, 255, 1),
       shape: StadiumBorder(),
       onPressed: onTap,
       child: Container(

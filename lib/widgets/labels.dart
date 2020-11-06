@@ -27,7 +27,7 @@ class Labels extends StatelessWidget {
           child: Text(
             subtitle,
             style: TextStyle(
-                color: Colors.blue[600],
+                color: Color.fromRGBO(68, 138, 255, 1),
                 fontSize: 18,
                 fontWeight: FontWeight.bold),
           ),
