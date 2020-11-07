@@ -1,9 +1,12 @@
+import 'package:chat_app/helpers/show_alert.dart';
+import 'package:chat_app/services/auth_service.dart';
 import 'package:chat_app/widgets/button_blue.dart';
 import 'package:chat_app/widgets/custom_input.dart';
 import 'package:chat_app/widgets/labels.dart';
 import 'package:chat_app/widgets/list_padding.dart';
 import 'package:chat_app/widgets/logo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -17,7 +20,9 @@ class LoginPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Logo(title: 'Fakessenger',),
+                    Logo(
+                      title: 'Fakessenger',
+                    ),
                     _Form(),
                     Labels(
                       route: 'register',
@@ -51,8 +56,11 @@ class _Form extends StatefulWidget {
 class __FormState extends State<_Form> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Container(
       margin: EdgeInsets.only(top: 30),
       padding: EdgeInsets.symmetric(horizontal: 40),
@@ -70,7 +78,21 @@ class __FormState extends State<_Form> {
             inputType: TextInputType.visiblePassword,
             isPassword: true,
           ),
-          ButtonBlue(onTap: () {}, text: 'Ingrese')
+          ButtonBlue(
+              onTap: authService.authenticating
+                  ? null
+                  : () async {
+                      FocusScope.of(context).unfocus();
+                      final isLoged = await authService.login(
+                          email: emailController.text.trim(),
+                          password: passwordController.text.trim());
+                      if(isLoged){
+                        Navigator.pushReplacementNamed(context, 'users');
+                      }else{
+                        showAlert(context, 'Login incorrecto', 'Revise sus credenciales nuevamente');
+                      }
+                    },
+              text: 'Ingrese')
         ],
       ),
     );

@@ -18,7 +18,7 @@ class ButtonBlue extends StatelessWidget {
         width: double.infinity,
         height: 55,
         child: Center(
-          child: Text('Ingrese', style: TextStyle(color: Colors.white, fontSize: 17),),
+          child: Text(text, style: TextStyle(color: Colors.white, fontSize: 17),),
         ),
       ),
     );

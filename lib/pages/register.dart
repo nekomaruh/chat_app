@@ -1,12 +1,14 @@
+import 'package:chat_app/helpers/show_alert.dart';
+import 'package:chat_app/services/auth_service.dart';
 import 'package:chat_app/widgets/button_blue.dart';
 import 'package:chat_app/widgets/custom_input.dart';
 import 'package:chat_app/widgets/labels.dart';
 import 'package:chat_app/widgets/list_padding.dart';
 import 'package:chat_app/widgets/logo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,7 +20,9 @@ class RegisterPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Logo(title: 'Register',),
+                    Logo(
+                      title: 'Register',
+                    ),
                     _Form(),
                     Labels(
                       route: 'login',
@@ -55,13 +59,14 @@ class __FormState extends State<_Form> {
   final passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
     return Container(
       margin: EdgeInsets.only(top: 40),
       padding: EdgeInsets.symmetric(horizontal: 40),
       child: Column(
         children: [
           CustomInput(
-              controller: emailController,
+              controller: nameController,
               icon: Icons.perm_identity,
               placeHolder: 'Name',
               inputType: TextInputType.text),
@@ -77,7 +82,26 @@ class __FormState extends State<_Form> {
             inputType: TextInputType.visiblePassword,
             isPassword: true,
           ),
-          ButtonBlue(onTap: () {}, text: 'Ingrese')
+          ButtonBlue(
+              onTap: authService.authenticating
+                  ? null
+                  : () async {
+                      print(nameController.text);
+                      print(emailController.text);
+                      print(passwordController.text);
+                      FocusScope.of(context).unfocus();
+                      final isRegistered = await authService.register(
+                          name: nameController.text.trim(),
+                          email: emailController.text.trim(),
+                          password: passwordController.text.trim());
+                      if (isRegistered) {
+                        Navigator.pushReplacementNamed(context, 'users');
+                      } else {
+                        showAlert(context, 'Registro incorrecto',
+                            'Ya existe el usuario ingresado');
+                      }
+                    },
+              text: 'Crear cuenta')
         ],
       ),
     );
