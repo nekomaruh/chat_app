@@ -22,7 +22,7 @@ const dbConnection = async() => {
         */
     }catch(e){
         console.log(e);
-        throw new Error('Error en la base de datos - Hbale con el admin');
+        throw new Error('Error en la base de datos - Hable con el admin');
     }
 }
 

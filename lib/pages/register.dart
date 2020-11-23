@@ -1,5 +1,6 @@
 import 'package:chat_app/helpers/show_alert.dart';
 import 'package:chat_app/services/auth_service.dart';
+import 'package:chat_app/services/socket_service.dart';
 import 'package:chat_app/widgets/button_blue.dart';
 import 'package:chat_app/widgets/custom_input.dart';
 import 'package:chat_app/widgets/labels.dart';
@@ -95,6 +96,9 @@ class __FormState extends State<_Form> {
                           email: emailController.text.trim(),
                           password: passwordController.text.trim());
                       if (isRegistered) {
+                        final socketService = Provider.of<SocketService>(context, listen: false);
+                        socketService.connect();
+                        //authService.login(email: nameController.text, password: passwordController.text);
                         Navigator.pushReplacementNamed(context, 'users');
                       } else {
                         showAlert(context, 'Registro incorrecto',

@@ -1,5 +1,8 @@
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/services/auth_service.dart';
+import 'package:chat_app/services/chat_service.dart';
+import 'package:chat_app/services/socket_service.dart';
+import 'package:chat_app/services/users_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -13,65 +16,68 @@ class _UsersPageState extends State<UsersPage> {
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
-  final users = [
-    User(uid: '1', name: 'Johan', email: 'johan@gmail.com', online: true),
-    User(uid: '2', name: 'Kevin', email: 'kevin@gmail.com', online: true),
-    User(uid: '3', name: 'Vianney', email: 'vianney@gmail.com', online: false),
-    User(uid: '4', name: 'Ercia', email: 'ercia@gmail.com', online: false),
-    User(uid: '5', name: 'Esteban', email: 'esteban@gmail.com', online: false),
-    User(
-        uid: '6', name: 'Cristina', email: 'cristina@gmail.com', online: false),
-    User(uid: '7', name: 'Claudia', email: 'vianney@gmail.com', online: false),
-    User(uid: '8', name: 'Cathy', email: 'vianney@gmail.com', online: false),
-    User(uid: '9', name: 'Carola', email: 'vianney@gmail.com', online: false),
-  ];
+  final usersService = UsersService();
+
+  List<User> users = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    this._loadUsers();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          authService.user.name,
-          style: TextStyle(color: Colors.black54),
-        ),
-        elevation: 1,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(
-            Icons.exit_to_app,
-            color: Colors.black54,
+        appBar: AppBar(
+          title: Text(
+            authService.user.name,
+            style: TextStyle(color: Colors.black54),
           ),
-          onPressed: () {
-            AuthService.deleteToken();
-            Navigator.pushReplacementNamed(context, 'login');
-          },
-        ),
-        actions: [
-          Container(
-            margin: EdgeInsets.only(right: 10),
-            child: Icon(
-              Icons.check_circle,
-              color: Colors.blue[400],
+          elevation: 1,
+          backgroundColor: Colors.white,
+          leading: IconButton(
+            icon: Icon(
+              Icons.exit_to_app,
+              color: Colors.black54,
             ),
-          )
-        ],
-      ),
-      body: SmartRefresher(
-        controller: _refreshController,
-        enablePullDown: true,
-        onRefresh: _loadUsers,
-        /*
+            onPressed: () {
+              socketService.disconnect();
+              AuthService.deleteToken();
+              Navigator.pushReplacementNamed(context, 'login');
+            },
+          ),
+          actions: [
+            Container(
+              margin: EdgeInsets.only(right: 10),
+              child: Icon(
+                socketService.serverStatus == ServerStatus.Online
+                    ? Icons.check_circle
+                    : Icons.cancel,
+                color: socketService.serverStatus == ServerStatus.Online
+                    ? Colors.blue[400]
+                    : Colors.red,
+              ),
+            )
+          ],
+        ),
+        body: SmartRefresher(
+          controller: _refreshController,
+          enablePullDown: true,
+          onRefresh: _loadUsers,
+          /*
         header: WaterDropHeader(
           //complete: Icon(Icons.check, color: Colors.blue[300],),
           waterDropColor: Colors.blue[400],
         ),
 
          */
-        child: _userListView(),
-      )
-    );
+          child: users == null ? Text('nada') : _userListView(),
+        ));
   }
 
   _userListView() {
@@ -85,6 +91,12 @@ class _UsersPageState extends State<UsersPage> {
 
   _userListTile(User user) {
     return ListTile(
+      onTap: (){
+        //print(user.name);
+        final chatService = Provider.of<ChatService>(context, listen: false);
+        chatService.userTo = user;
+        Navigator.pushNamed(context, 'chat');
+      },
       title: Text(user.name),
       leading: CircleAvatar(
         child: Text(user.name.substring(0, 2)),
@@ -102,11 +114,12 @@ class _UsersPageState extends State<UsersPage> {
 
   _loadUsers() async {
     // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
+    this.users = await usersService.getUsers();
+    setState(() {
+
+    });
+    //await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();
   }
-
-
-
 }

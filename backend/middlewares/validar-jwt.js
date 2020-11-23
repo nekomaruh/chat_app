@@ -21,8 +21,6 @@ const validarJWT = (req, res, next) => {
             msg: 'Token no válido'
         })
     }
-
-
     
 }
 
