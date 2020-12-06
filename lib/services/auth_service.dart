@@ -91,6 +91,7 @@ class AuthService with ChangeNotifier {
       final loginRes = loginResponseFromJson(res.body);
       this.user = loginRes.usuario;
       this._saveToken(loginRes.token);
+      print(token);
       return true;
     }else{
       this._logOut(token);
